@@ -61,16 +61,20 @@ const FirstScreen = () => {
   return (
     <ScreenDiv key="first">
       <form onSubmit={validateAadhar} className="grid gap-3">
-        <div className="flex gap-4 items-center">
-          <label className="text-stone-400">Aadhar Number</label>
+        <div className="">
+          {/* <label className="text-stone-400">Aadhar Number</label> */}
+          <p className="text-stone-300 mb-1">Aadhar Number</p>
+          <p className="text-stone-500 text-xs mb-4">
+            Enter your 12 digit aadhar number without spaces
+          </p>
           <input
             type="text"
             value={aadharInput}
-            className={` flex-1 border-2 text-sm border-stone-900 placeholder:font-sans font-mono px-2 py-1 rounded-md shadow-md bg-transparent text-stone-200 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 ${
+            className={` flex-1 w-full border-2 border-stone-900 placeholder:font-sans font-mono px-2 py-1 rounded-md shadow-md bg-transparent text-stone-200 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 ${
               error !== "" && "!border-red-400/25"
             }`}
             onChange={(e) => setAadharInput(e.target.value)}
-            placeholder="Enter 12 digit aadhar number"
+            placeholder="e.g. 123412341234"
           />
         </div>
         <p className="text-red-400 text-sm">{error}</p>
@@ -142,7 +146,7 @@ const SecondScreen = () => {
             className="grid gap-3"
           >
             <div className="">
-              <p className="text-stone-300 mb-0.5">OTP</p>
+              <p className="text-stone-300 mb-1">OTP</p>
               <p className="text-stone-500 text-xs mb-4">
                 Check your registered mobile number for OTP
               </p>
