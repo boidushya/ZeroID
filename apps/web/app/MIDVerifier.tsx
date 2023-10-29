@@ -154,6 +154,8 @@ const SecondScreen = () => {
                 renderInput={(props) => (
                   <input
                     {...props}
+                    pattern="\d*"
+                    type="text"
                     className="!w-12 !h-12 rounded-md bg-transparent border-2 border-stone-900"
                   />
                 )}
