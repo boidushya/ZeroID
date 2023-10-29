@@ -1,4 +1,4 @@
-import { CONTENT } from "@/app/api/values";
+import { CONTENT } from "@/constants";
 
 export async function POST(request: Request, response: Response) {
   try {

@@ -1,10 +1,11 @@
 "use client";
 
 import type { NextPage } from "next";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useRef, useState } from "react";
 import { useGlobalStore } from "@/contexts";
 import OTPInput from "react-otp-input";
 import { AnimatePresence, motion } from "framer-motion";
+import { useResizeObserver } from "@/hooks";
 
 const screenAnimStates = {
   hidden: { opacity: 0, x: 50 },
@@ -14,7 +15,7 @@ const screenAnimStates = {
   },
   exit: {
     opacity: 0,
-    x: -100,
+    x: -150,
   },
 };
 
@@ -120,44 +121,62 @@ const SecondScreen = () => {
   };
   return (
     <ScreenDiv key="second">
-      {isLoading ? (
-        <div className="flex items-center justify-between gap-2 text-stone-400">
-          Authenticating with Aadhar <div className="loader"></div>
-        </div>
-      ) : (
-        <form onSubmit={validateOTP} className="grid gap-3">
-          <div className="">
-            <p className="text-stone-300 mb-0.5">OTP</p>
-            <p className="text-stone-500 text-xs mb-4">
-              Check your registered mobile number for OTP
-            </p>
-            <OTPInput
-              value={otpInput}
-              onChange={setOtpInput}
-              numInputs={6}
-              renderSeparator={<span className="flex-1"></span>}
-              renderInput={(props) => (
-                <input
-                  {...props}
-                  className="!w-12 !h-12 rounded-md bg-transparent border-2 border-stone-900"
-                />
-              )}
-            />
-          </div>
-          <p className="text-red-400 text-sm">{error}</p>
-          <div className="flex w-full gap-2">
-            <button
-              className="btn btn-secondary flex-1"
-              onClick={decrementScreen}
-            >
-              Back
-            </button>
-            <button className="btn flex-1" type="submit">
-              Next
-            </button>
-          </div>
-        </form>
-      )}
+      <AnimatePresence initial={false}>
+        {isLoading ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex items-center justify-between gap-2 text-stone-400"
+          >
+            Authenticating with Aadhar <div className="loader"></div>
+          </motion.div>
+        ) : (
+          <motion.form
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: 0.5 }}
+            onSubmit={validateOTP}
+            className="grid gap-3"
+          >
+            <div className="">
+              <p className="text-stone-300 mb-0.5">OTP</p>
+              <p className="text-stone-500 text-xs mb-4">
+                Check your registered mobile number for OTP
+              </p>
+              <OTPInput
+                value={otpInput}
+                onChange={setOtpInput}
+                numInputs={6}
+                renderSeparator={<span className="flex-1"></span>}
+                renderInput={(props) => (
+                  <input
+                    {...props}
+                    className="!w-12 !h-12 rounded-md bg-transparent border-2 border-stone-900"
+                  />
+                )}
+              />
+            </div>
+            <p className="text-red-400 text-sm">{error}</p>
+            <div className="flex w-full gap-2">
+              <button
+                className="btn btn-secondary flex-1"
+                onClick={(e) => {
+                  e.preventDefault();
+                  decrementScreen();
+                }}
+              >
+                Back
+              </button>
+              <button className="btn flex-1" type="submit">
+                Next
+              </button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
     </ScreenDiv>
   );
 };
@@ -168,9 +187,6 @@ const ScreenDiv = ({ children, ...props }) => (
     initial="hidden"
     animate="show"
     exit="exit"
-    transition={{
-      duration: 0.1,
-    }}
     {...props}
   >
     {children}
@@ -266,24 +282,21 @@ const ThirdScreen = () => {
   );
 };
 
-const Screen = () => {
-  const { currentScreen } = useGlobalStore();
-  switch (currentScreen) {
-    case 0:
-      return <FirstScreen key="first" />;
-    case 1:
-      return <SecondScreen key="second" />;
-    case 2:
-      return <ThirdScreen key="third" />;
-    default:
-      return <div>Something went wrong</div>;
-  }
-};
-
 const MIDVerifier: NextPage<{ isVisible?: boolean }> = ({
   isVisible = true,
 }) => {
   const { currentScreen } = useGlobalStore();
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  const onResize = useCallback((target: HTMLDivElement) => {
+    if (ref.current) {
+      ref.current.style.height = `${target.offsetHeight}px`;
+    }
+    console.log(`Change height to ${target.offsetHeight}px`);
+  }, []);
+
+  const contentRef = useResizeObserver(onResize);
   return (
     <AnimatePresence>
       {isVisible && (
@@ -292,53 +305,56 @@ const MIDVerifier: NextPage<{ isVisible?: boolean }> = ({
           initial="hidden"
           animate="show"
           exit="exit"
-          className="p-6 shadow-2xl rounded-2xl bg-stone-950 relative overflow-hidden w-[24rem]"
+          ref={ref}
+          className="transition-[height] bg-stone-950 shadow-2xl rounded-2xl relative overflow-hidden w-[24rem]"
         >
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="font-medium text-2xl text-stone-300">Identity</h1>
-            <p
-              className="text-xs font-bold text-blue-900 bg-blue-400 rounded-full px-2 py-0.5 flex items-center gap-1 lock-anim whitespace-nowrap overflow-hidden relative bg-overlay"
-              onClick={() => {
-                localStorage.clear();
-                window.location.reload();
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-                stroke="currentColor"
-                className="w-3 h-3 flex-shrink-0 lock-closed-anim"
+          <div ref={contentRef} className="p-6 ">
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="font-medium text-2xl text-stone-300">Identity</h1>
+              <p
+                className="text-xs font-bold text-blue-900 bg-blue-400 rounded-full px-2 py-0.5 flex items-center gap-1 lock-anim whitespace-nowrap overflow-hidden relative bg-overlay"
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-                />
-              </svg>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-                stroke="currentColor"
-                className="w-3 h-3 flex-shrink-0 lock-open-anim"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-                />
-              </svg>
-              <span>Secured by MID </span>
-            </p>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  stroke="currentColor"
+                  className="w-3 h-3 flex-shrink-0 lock-closed-anim"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                  />
+                </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  stroke="currentColor"
+                  className="w-3 h-3 flex-shrink-0 lock-open-anim"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                  />
+                </svg>
+                <span>Secured by MID </span>
+              </p>
+            </div>
+            <AnimatePresence mode="wait">
+              {currentScreen === 0 && <FirstScreen key="0" />}
+              {currentScreen === 1 && <SecondScreen key="1" />}
+              {currentScreen === 2 && <ThirdScreen key="2" />}
+            </AnimatePresence>
           </div>
-          <AnimatePresence mode="wait">
-            {currentScreen === 0 && <FirstScreen key="0" />}
-            {currentScreen === 1 && <SecondScreen key="1" />}
-            {/* <Screen /> */}
-          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
