@@ -2,9 +2,38 @@
 
 import type { NextPage } from "next";
 import { FormEvent, useEffect, useState } from "react";
-import { useGlobalStore } from "./contexts";
+import { useGlobalStore } from "@/contexts";
 import OTPInput from "react-otp-input";
 import { AnimatePresence, motion } from "framer-motion";
+
+const screenAnimStates = {
+  hidden: { opacity: 0, x: 50 },
+  show: {
+    opacity: 1,
+    x: 0,
+  },
+  exit: {
+    opacity: 0,
+    x: -100,
+  },
+};
+
+const containerAnimStates = {
+  hidden: { opacity: 0, scale: 0.75, y: 50 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.5,
+    y: 50,
+    transition: {
+      duration: 0.1,
+    },
+  },
+};
 
 const FirstScreen = () => {
   const [error, setError] = useState("");
@@ -29,24 +58,26 @@ const FirstScreen = () => {
     }
   };
   return (
-    <form onSubmit={validateAadhar} className="grid gap-3">
-      <div className="flex gap-4 items-center">
-        <label className="text-stone-400">Aadhar Number</label>
-        <input
-          type="text"
-          value={aadharInput}
-          className={` flex-1 border-2 text-sm border-stone-900 placeholder:font-sans font-mono px-2 py-1 rounded-md shadow-md bg-transparent text-stone-200 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 ${
-            error !== "" && "!border-red-400/25"
-          }`}
-          onChange={(e) => setAadharInput(e.target.value)}
-          placeholder="Enter 12 digit aadhar number"
-        />
-      </div>
-      <p className="text-red-400 text-sm">{error}</p>
-      <button className="btn" type="submit">
-        Next
-      </button>
-    </form>
+    <ScreenDiv key="first">
+      <form onSubmit={validateAadhar} className="grid gap-3">
+        <div className="flex gap-4 items-center">
+          <label className="text-stone-400">Aadhar Number</label>
+          <input
+            type="text"
+            value={aadharInput}
+            className={` flex-1 border-2 text-sm border-stone-900 placeholder:font-sans font-mono px-2 py-1 rounded-md shadow-md bg-transparent text-stone-200 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 ${
+              error !== "" && "!border-red-400/25"
+            }`}
+            onChange={(e) => setAadharInput(e.target.value)}
+            placeholder="Enter 12 digit aadhar number"
+          />
+        </div>
+        <p className="text-red-400 text-sm">{error}</p>
+        <button className="btn" type="submit">
+          Next
+        </button>
+      </form>
+    </ScreenDiv>
   );
 };
 
@@ -88,7 +119,7 @@ const SecondScreen = () => {
     }, 5000);
   };
   return (
-    <>
+    <ScreenDiv key="second">
       {isLoading ? (
         <div className="flex items-center justify-between gap-2 text-stone-400">
           Authenticating with Aadhar <div className="loader"></div>
@@ -127,15 +158,29 @@ const SecondScreen = () => {
           </div>
         </form>
       )}
-    </>
+    </ScreenDiv>
   );
 };
 
+const ScreenDiv = ({ children, ...props }) => (
+  <motion.div
+    variants={screenAnimStates}
+    initial="hidden"
+    animate="show"
+    exit="exit"
+    transition={{
+      duration: 0.1,
+    }}
+    {...props}
+  >
+    {children}
+  </motion.div>
+);
 const ThirdScreen = () => {
   const { isVerified, decrementScreen, resetScreen, details } =
     useGlobalStore();
   return (
-    <div className="grid gap-3">
+    <ScreenDiv key="third" className="grid gap-3">
       <div className="flex items-center gap-2 justify-between mb-4">
         <p className="text-stone-300">Verification Status</p>
         <p
@@ -217,7 +262,7 @@ const ThirdScreen = () => {
           </>
         )}
       </div>
-    </div>
+    </ScreenDiv>
   );
 };
 
@@ -225,41 +270,25 @@ const Screen = () => {
   const { currentScreen } = useGlobalStore();
   switch (currentScreen) {
     case 0:
-      return <FirstScreen />;
+      return <FirstScreen key="first" />;
     case 1:
-      return <SecondScreen />;
+      return <SecondScreen key="second" />;
     case 2:
-      return <ThirdScreen />;
+      return <ThirdScreen key="third" />;
     default:
       return <div>Something went wrong</div>;
   }
 };
 
-const container = {
-  hidden: { opacity: 0, scale: 0.75, y: 50 },
-  show: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.5,
-    y: 50,
-    transition: {
-      duration: 0.1,
-    },
-  },
-};
-
 const MIDVerifier: NextPage<{ isVisible?: boolean }> = ({
   isVisible = true,
 }) => {
+  const { currentScreen } = useGlobalStore();
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          variants={container}
+          variants={containerAnimStates}
           initial="hidden"
           animate="show"
           exit="exit"
@@ -305,7 +334,11 @@ const MIDVerifier: NextPage<{ isVisible?: boolean }> = ({
               <span>Secured by MID </span>
             </p>
           </div>
-          <Screen />
+          <AnimatePresence mode="wait">
+            {currentScreen === 0 && <FirstScreen key="0" />}
+            {currentScreen === 1 && <SecondScreen key="1" />}
+            {/* <Screen /> */}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
