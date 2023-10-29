@@ -1,135 +1,302 @@
-import Image from "next/image";
-import { Card } from "ui";
-import styles from "./page.module.css";
+"use client";
 
-function Gradient({
-  conic,
-  className,
-  small,
-}: {
-  small?: boolean;
-  conic?: boolean;
-  className?: string;
-}): JSX.Element {
+import { FormEvent, useState } from "react";
+import { useGlobalStore } from "./contexts";
+import OTPInput from "react-otp-input";
+
+const FirstScreen = () => {
+  const [error, setError] = useState("");
+  const { aadhar, setAadhar, incrementScreen } = useGlobalStore();
+  const [aadharInput, setAadharInput] = useState(aadhar);
+  const validateAadhar = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/validateAadhar", {
+        method: "POST",
+        body: JSON.stringify({ aadhar: aadharInput }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setAadhar(aadharInput);
+        incrementScreen();
+      } else {
+        setError(data.error);
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    }
+  };
   return (
-    <span
-      className={[
-        styles.gradient,
-        conic ? styles.glowConic : undefined,
-        small ? styles.gradientSmall : styles.gradientLarge,
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    />
+    <form onSubmit={validateAadhar} className="grid gap-3">
+      <div className="flex gap-4 items-center">
+        <label className="text-stone-400">Aadhar Number</label>
+        <input
+          type="text"
+          value={aadharInput}
+          className={` flex-1 border-2 text-sm border-stone-900 placeholder:font-sans font-mono px-2 py-1 rounded-md shadow-md bg-transparent text-stone-200 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 ${
+            error !== "" && "!border-red-400/25"
+          }`}
+          onChange={(e) => setAadharInput(e.target.value)}
+          placeholder="Enter 12 digit aadhar number"
+        />
+      </div>
+      <p className="text-red-400 text-sm">{error}</p>
+      <button className="btn" type="submit">
+        Next
+      </button>
+    </form>
   );
-}
+};
 
-const LINKS = [
-  {
-    title: "Docs",
-    href: "https://turbo.build/repo/docs",
-    description: "Find in-depth information about Turborepo features and API.",
-  },
-  {
-    title: "Learn",
-    href: "https://turbo.build/repo/docs/handbook",
-    description: "Learn more about monorepos with our handbook.",
-  },
-  {
-    title: "Templates",
-    href: "https://turbo.build/repo/docs/getting-started/from-example",
-    description: "Choose from over 15 examples and deploy with a single click.",
-  },
-  {
-    title: "Deploy",
-    href: "https://vercel.com/new",
-    description:
-      " Instantly deploy your Turborepo to a shareable URL with Vercel.",
-  },
-];
+const SecondScreen = () => {
+  const [error, setError] = useState("");
 
-export default function Page(): JSX.Element {
+  const {
+    aadhar,
+    decrementScreen,
+    incrementScreen,
+    setIsVerified,
+    setDetails,
+  } = useGlobalStore();
+
+  const [otpInput, setOtpInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validateOTP = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(async () => {
+      try {
+        const res = await fetch("/api/validateOTP", {
+          method: "POST",
+          body: JSON.stringify({ OTP: otpInput, aadhar }),
+        });
+        const data = await res.json();
+        setIsLoading(false);
+        if (res.ok) {
+          setIsVerified(true);
+          setDetails(data);
+          incrementScreen();
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Something went wrong. Please try again.");
+      }
+    }, 5000);
+  };
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          examples/basic&nbsp;
-          <code className={styles.code}>web</code>
+    <>
+      {isLoading ? (
+        <div className="flex items-center justify-between gap-2 text-stone-400">
+          Authenticating with Aadhar <div className="loader"></div>
+        </div>
+      ) : (
+        <form onSubmit={validateOTP} className="grid gap-3">
+          <div className="">
+            <p className="text-stone-300 mb-0.5">OTP</p>
+            <p className="text-stone-500 text-xs mb-4">
+              Check your registered mobile number for OTP
+            </p>
+            <OTPInput
+              value={otpInput}
+              onChange={setOtpInput}
+              numInputs={6}
+              renderSeparator={<span className="flex-1"></span>}
+              renderInput={(props) => (
+                <input
+                  {...props}
+                  className="!w-12 !h-12 rounded-md bg-transparent border-2 border-stone-900"
+                />
+              )}
+            />
+          </div>
+          <p className="text-red-400 text-sm">{error}</p>
+          <div className="flex w-full gap-2">
+            <button
+              className="btn btn-secondary flex-1"
+              onClick={decrementScreen}
+            >
+              Back
+            </button>
+            <button className="btn flex-1" type="submit">
+              Next
+            </button>
+          </div>
+        </form>
+      )}
+    </>
+  );
+};
+
+const ThirdScreen = () => {
+  const { isVerified, decrementScreen, resetScreen, details } =
+    useGlobalStore();
+  return (
+    <div className="grid gap-3">
+      <div className="flex items-center gap-2 justify-between mb-4">
+        <p className="text-stone-300">Verification Status</p>
+        <p
+          className={
+            isVerified ? "text-green-400 text-sm" : "text-red-400 text-sm"
+          }
+        >
+          {isVerified ? (
+            <div className="bg-green-800/50 text-green-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                />
+              </svg>
+              Verified
+            </div>
+          ) : (
+            <div className="bg-yellow-800/50 text-yellow-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z"
+                />
+              </svg>
+              Unverified
+            </div>
+          )}
         </p>
-        <div>
+      </div>
+      {isVerified && (
+        <div className="w-full">
+          <div className="avatar mx-auto mb-8" />
+          <p className="flex items-center justify-between">
+            <span className="text-stone-500">Name</span>
+            {details.name}
+          </p>
+          <p className="flex items-center justify-between">
+            <span className="text-stone-500">Date of Birth</span>
+            {details.dob}
+          </p>
           <a
-            href="https://vercel.com?utm_source=create-turbo&utm_medium=basic&utm_campaign=create-turbo"
-            rel="noopener noreferrer"
+            className="mt-8 -mb-2 text-center block text-xs text-stone-600 hover:underline underline-offset-1"
+            href="https://minascan.io/"
             target="_blank"
           >
-            By{" "}
-            <Image
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              height={24}
-              priority
-              src="/vercel.svg"
-              width={100}
-            />
+            Verify identity on MinaScan
           </a>
         </div>
-      </div>
-
-      <div className={styles.hero}>
-        <div className={styles.heroContent}>
-          <div className={styles.logos}>
-            <div className={styles.circles}>
-              <Image
-                alt="Turborepo"
-                height={614}
-                src="circles.svg"
-                width={614}
-              />
-            </div>
-            <div className={styles.logoGradientContainer}>
-              <Gradient className={styles.logoGradient} conic small />
-            </div>
-
-            <div className={styles.logo}>
-              <Image
-                alt=""
-                height={120}
-                priority
-                src="turborepo.svg"
-                width={120}
-              />
-            </div>
-          </div>
-          <Gradient className={styles.backgroundGradient} conic />
-          <div className={styles.turborepoWordmarkContainer}>
-            <svg
-              className={styles.turborepoWordmark}
-              viewBox="0 0 506 50"
-              width={200}
-              xmlns="http://www.w3.org/2000/svg"
+      )}
+      <div className="flex w-full gap-2">
+        {!isVerified && (
+          <>
+            <button
+              className="btn btn-secondary flex-1"
+              onClick={decrementScreen}
             >
-              <title>Turborepo logo</title>
-              <path d="M53.7187 12.0038V1.05332H0.945312V12.0038H20.8673V48.4175H33.7968V12.0038H53.7187Z" />
-              <path d="M83.5362 49.1431C99.764 49.1431 108.67 40.8972 108.67 27.3081V1.05332H95.7401V26.0547C95.7401 33.6409 91.7821 37.9287 83.5362 37.9287C75.2904 37.9287 71.3324 33.6409 71.3324 26.0547V1.05332H58.4029V27.3081C58.4029 40.8972 67.3084 49.1431 83.5362 49.1431Z" />
-              <path d="M128.462 32.7174H141.325L151.484 48.4175H166.327L154.848 31.3321C161.313 29.0232 165.271 23.8778 165.271 16.8853C165.271 6.72646 157.685 1.05332 146.141 1.05332H115.532V48.4175H128.462V32.7174ZM128.462 22.4925V11.8719H145.481C150.033 11.8719 152.54 13.8509 152.54 17.2152C152.54 20.3816 150.033 22.4925 145.481 22.4925H128.462Z" />
-              <path d="M171.287 48.4175H205.128C215.683 48.4175 221.752 43.404 221.752 35.0262C221.752 29.419 218.189 25.593 213.967 23.8778C216.87 22.4925 220.432 19.1942 220.432 13.9828C220.432 5.60502 214.495 1.05332 204.006 1.05332H171.287V48.4175ZM183.689 19.59V11.542H202.687C206.249 11.542 208.228 12.9273 208.228 15.566C208.228 18.2047 206.249 19.59 202.687 19.59H183.689ZM183.689 29.2871H203.875C207.371 29.2871 209.284 31.0022 209.284 33.5749C209.284 36.1476 207.371 37.8628 203.875 37.8628H183.689V29.2871Z" />
-              <path d="M253.364 0.261719C236.806 0.261719 224.866 10.6185 224.866 24.7354C224.866 38.8523 236.806 49.2091 253.364 49.2091C269.922 49.2091 281.796 38.8523 281.796 24.7354C281.796 10.6185 269.922 0.261719 253.364 0.261719ZM253.364 11.4761C262.072 11.4761 268.602 16.6215 268.602 24.7354C268.602 32.8493 262.072 37.9947 253.364 37.9947C244.656 37.9947 238.126 32.8493 238.126 24.7354C238.126 16.6215 244.656 11.4761 253.364 11.4761Z" />
-              <path d="M300.429 32.7174H313.292L323.451 48.4175H338.294L326.815 31.3321C333.28 29.0232 337.238 23.8778 337.238 16.8853C337.238 6.72646 329.652 1.05332 318.108 1.05332H287.499V48.4175H300.429V32.7174ZM300.429 22.4925V11.8719H317.448C322 11.8719 324.507 13.8509 324.507 17.2152C324.507 20.3816 322 22.4925 317.448 22.4925H300.429Z" />
-              <path d="M343.254 1.05332V48.4175H389.299V37.467H355.92V29.7489H385.539V19.0622H355.92V12.0038H389.299V1.05332H343.254Z" />
-              <path d="M408.46 33.3111H425.677C437.221 33.3111 444.807 27.7699 444.807 17.2152C444.807 6.59453 437.221 1.05332 425.677 1.05332H395.53V48.4175H408.46V33.3111ZM408.46 22.5585V11.8719H424.951C429.569 11.8719 432.076 13.8509 432.076 17.2152C432.076 20.5135 429.569 22.5585 424.951 22.5585H408.46Z" />
-              <path d="M476.899 0.261719C460.341 0.261719 448.401 10.6185 448.401 24.7354C448.401 38.8523 460.341 49.2091 476.899 49.2091C493.456 49.2091 505.33 38.8523 505.33 24.7354C505.33 10.6185 493.456 0.261719 476.899 0.261719ZM476.899 11.4761C485.606 11.4761 492.137 16.6215 492.137 24.7354C492.137 32.8493 485.606 37.9947 476.899 37.9947C468.191 37.9947 461.66 32.8493 461.66 24.7354C461.66 16.6215 468.191 11.4761 476.899 11.4761Z" />
-            </svg>
-          </div>
-        </div>
+              Back
+            </button>
+            <button className="btn flex-1" onClick={resetScreen}>
+              Try Again
+            </button>
+          </>
+        )}
       </div>
+    </div>
+  );
+};
 
-      <div className={styles.grid}>
-        {LINKS.map(({ title, href, description }) => (
-          <Card className={styles.card} href={href} key={title} title={title}>
-            {description}
-          </Card>
-        ))}
+const Screen = () => {
+  const { currentScreen } = useGlobalStore();
+  switch (currentScreen) {
+    case 0:
+      return <FirstScreen />;
+    case 1:
+      return <SecondScreen />;
+    case 2:
+      return <ThirdScreen />;
+    default:
+      return <div>Something went wrong</div>;
+  }
+};
+
+export default function Home() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-24 relative">
+      <nav className="absolute top-0 left-0 w-full p-4 text-xl text-stone-200 font-bold flex items-center justify-between">
+        Mina ID POC
+        <a
+          href="https://github.com/boidushya/MID"
+          target="_blank"
+          className="btn !flex items-center gap-2"
+        >
+          <svg
+            role="img"
+            viewBox="0 0 24 24"
+            className="w-4 h-4 fill-current"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>GitHub</title>
+            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+          </svg>
+          <span>Source Code</span>
+        </a>
+      </nav>
+      <div className="p-6 shadow-2xl rounded-2xl bg-stone-950 relative overflow-hidden w-[24rem]">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="font-medium text-2xl text-stone-300">Identity</h1>
+          <p
+            className="text-xs font-bold text-blue-900 bg-blue-400 rounded-full px-2 py-0.5 flex items-center gap-1 lock-anim whitespace-nowrap overflow-hidden relative bg-overlay"
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-3 h-3 flex-shrink-0 lock-closed-anim"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-3 h-3 flex-shrink-0 lock-open-anim"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+              />
+            </svg>
+            <span>Secured by MID </span>
+          </p>
+        </div>
+        <Screen />
       </div>
     </main>
   );
