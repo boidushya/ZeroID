@@ -55,6 +55,11 @@ body:after {
   z-index: -1;
 }
 
+.bg-demo {
+  background: radial-gradient(ellipse at top, #0000008a, transparent),
+    radial-gradient(ellipse at 25% 25%, #ff00ff6a, transparent);
+}
+
 .bg-overlay {
   background-image: linear-gradient(
     180deg,
@@ -73,7 +78,8 @@ body:after {
   );
   border: 1px solid #4d4ae8;
   border-radius: 0.5rem;
-  box-shadow: rgba(255, 255, 255, 0.15) 0 1px 0 inset,
+  box-shadow:
+    rgba(255, 255, 255, 0.15) 0 1px 0 inset,
     rgba(46, 54, 80, 0.075) 0 1px 1px;
   box-sizing: border-box;
   color: #ffffff;
@@ -86,8 +92,11 @@ body:after {
   padding: 0.25rem 1rem;
   text-align: center;
   text-transform: none;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
@@ -107,8 +116,10 @@ body:after {
 .btn:focus {
   background-color: #413fc5;
   border-color: #3e3bba;
-  box-shadow: rgba(255, 255, 255, 0.15) 0 1px 0 inset,
-    rgba(46, 54, 80, 0.075) 0 1px 1px, rgba(104, 101, 235, 0.5) 0 0 0 0.2rem;
+  box-shadow:
+    rgba(255, 255, 255, 0.15) 0 1px 0 inset,
+    rgba(46, 54, 80, 0.075) 0 1px 1px,
+    rgba(104, 101, 235, 0.5) 0 0 0 0.2rem;
 }
 
 .btn:active {
@@ -119,7 +130,8 @@ body:after {
 }
 
 .btn:active:focus {
-  box-shadow: rgba(46, 54, 80, 0.125) 0 3px 5px inset,
+  box-shadow:
+    rgba(46, 54, 80, 0.125) 0 3px 5px inset,
     rgba(104, 101, 235, 0.5) 0 0 0 0.2rem;
 }
 
@@ -148,12 +160,15 @@ body:after {
 .btn-secondary:focus {
   background-color: #2a2b2c;
   border-color: #2a2b2c;
-  box-shadow: rgba(255, 255, 255, 0.15) 0 1px 0 inset,
-    rgba(46, 54, 80, 0.075) 0 1px 1px, rgba(80, 80, 80, 0.5) 0 0 0 0.2rem;
+  box-shadow:
+    rgba(255, 255, 255, 0.15) 0 1px 0 inset,
+    rgba(46, 54, 80, 0.075) 0 1px 1px,
+    rgba(80, 80, 80, 0.5) 0 0 0 0.2rem;
 }
 
 .btn-secondary:active:focus {
-  box-shadow: rgba(46, 54, 80, 0.125) 0 3px 5px inset,
+  box-shadow:
+    rgba(46, 54, 80, 0.125) 0 3px 5px inset,
     rgba(60, 60, 60, 0.5) 0 0 0 0.2rem;
 }
 
