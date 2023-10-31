@@ -45,3 +45,22 @@ function createNewRoot(aadharNumber: number, salt: string) {
 
 // let initialCommitment: Field = Tree.getRoot();
 let [initialCommitment, qrString] = createNewRoot(a1Adnum, a1Salt);
+
+let minaID = new MID(zkappAddress);
+console.log('Deploying Contract .....');
+
+if (doProofs) {
+  await MID.compile();
+}
+
+let tx = await Mina.transaction(feePayer, () => {
+  AccountUpdate.fundNewAccount(feePayer).send({
+    to: zkappAddress,
+    amount: initialBalance,
+  });
+  minaID.deploy();
+  minaID.initState(feePayer, initialCommitment);
+});
+await tx.prove();
+await tx.sign([feePayerKey, zkappKey]).send();
+console.log('Contract Deployed....');
