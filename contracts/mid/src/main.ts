@@ -21,3 +21,27 @@ let feePayer = Local.testAccounts[0].publicKey;
 
 let zkappKey = PrivateKey.random();
 let zkappAddress = zkappKey.toPublicKey();
+
+class MyMerkleWitness extends MerkleWitness(8) {}
+let leafNode = 0n;
+const Tree = new MerkleTree(8);
+
+let a1Adnum = 123456789012;
+let a1Salt = 'bro';
+
+let a2Adnum = 987654321012;
+let a2Salt = 'hello';
+
+function createNewRoot(aadharNumber: number, salt: string) {
+  let account = new Account({
+    aadharNumber: aadharNumber,
+    salt: salt,
+  });
+  let qrString: Field = account.hash();
+  Tree.setLeaf(leafNode, qrString);
+  leafNode++;
+  return [Tree.getRoot(), qrString];
+}
+
+// let initialCommitment: Field = Tree.getRoot();
+let [initialCommitment, qrString] = createNewRoot(a1Adnum, a1Salt);
