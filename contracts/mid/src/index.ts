@@ -1,3 +1,3 @@
-import { Add } from './Add.js';
+import { MID } from './mid.js';
 
-export { Add };
+export { MID };
