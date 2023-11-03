@@ -1,0 +1,13 @@
+Hi!!
+
+
+This is the concept file. In this project we were trying to acheieve the validation of the indian users on the basis of the aadhar number.
+The exsting sytem is just not enough because we it's (What's the word >>>> ) Hackable... Anyone can stole your identity, but we are trying to secure it.
+And yeah it is wallet less and gasless.
+
+Current concept that we have applied is onchain validation using merkle proof, but turns out it has certain limitations and we don't want it.
+So, we are moving from on-chain to offchain but still making sure it is credebilty in onchainness. 
+
+On the D-Day  you will understand what we are trying to acheieve. So, stay tuned and some words from us :
+
+Let's make it Big MINA...
