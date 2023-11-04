@@ -181,7 +181,7 @@ const SecondScreen = () => {
                     pattern="[0-9]*"
                     inputMode="numeric"
                     type="text"
-                    className="!w-12 !h-12 rounded-md bg-transparent border-2 border-stone-900"
+                    className="!w-12 !h-12 rounded-md bg-transparent transition-colors border-2 border-stone-900 focus:outline-none focus:border-stone-600 duration-100"
                   />
                 )}
               />
