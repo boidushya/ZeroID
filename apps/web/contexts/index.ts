@@ -9,8 +9,6 @@ interface AadharState {
   currentScreen: number;
   isVerified: boolean;
   details: {
-    name: string;
-    dob: string;
     aadhar: string;
     uuid: string;
   };
