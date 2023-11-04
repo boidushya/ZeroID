@@ -5,17 +5,15 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+[data-sonner-toaster] {
+  --success-bg: theme("colors.green.300") !important;
+  --success-text: theme("colors.green.900") !important;
+  --success-border: theme("colors.green.500") !important;
 }
 
 body {
@@ -191,8 +189,8 @@ body:after {
 }
 
 .avatar {
-  width: 8rem;
-  height: 8rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
 
   background: radial-gradient(

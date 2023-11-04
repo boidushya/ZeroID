@@ -12,6 +12,7 @@ interface AadharState {
     name: string;
     dob: string;
     aadhar: string;
+    uuid: string;
   };
   setAadhar: (newAadhar: string) => void;
   setAadharValid: (isValid: boolean) => void;
@@ -33,6 +34,7 @@ export const useGlobalStore = create<AadharState>()(
         name: "",
         dob: "",
         aadhar: "",
+        uuid: "",
       },
       setDetails: (details) => set(() => ({ details })),
       incrementScreen: () =>

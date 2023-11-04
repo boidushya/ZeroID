@@ -6,6 +6,13 @@ import { useGlobalStore } from "@/contexts";
 import OTPInput from "react-otp-input";
 import { AnimatePresence, motion } from "framer-motion";
 import { useResizeObserver } from "@/hooks";
+import QRCode from "@/components/QRCode";
+import { copyToClipboard, truncate } from "@/utils/functions";
+import { Toaster, toast } from "sonner";
+import html2canvas from "html2canvas";
+import downloadjs from "downloadjs";
+
+const URL = "https://mid-lake.vercel.app";
 
 const screenAnimStates = {
   hidden: { opacity: 0, x: 50 },
@@ -35,6 +42,18 @@ const containerAnimStates = {
     },
   },
 };
+
+const ScreenDiv = ({ children, ...props }) => (
+  <motion.div
+    variants={screenAnimStates}
+    initial="hidden"
+    animate="show"
+    exit="exit"
+    {...props}
+  >
+    {children}
+  </motion.div>
+);
 
 const FirstScreen = () => {
   const [error, setError] = useState("");
@@ -188,86 +207,118 @@ const SecondScreen = () => {
   );
 };
 
-const ScreenDiv = ({ children, ...props }) => (
-  <motion.div
-    variants={screenAnimStates}
-    initial="hidden"
-    animate="show"
-    exit="exit"
-    {...props}
-  >
-    {children}
-  </motion.div>
-);
 const ThirdScreen = () => {
   const { isVerified, decrementScreen, resetScreen, details } =
     useGlobalStore();
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  const onCopySuccess = useCallback(() => {
+    toast.success("Unique ID copied", {
+      description: "Share this with others to verify your identity",
+    });
+  }, []);
+  const handleCaptureClick = async () => {
+    const canvas = await html2canvas(ref.current as HTMLElement, {
+      backgroundColor: null,
+      onclone: (data) => {
+        toast.success("Downloading image", {
+          description: "Share this QR to verify your identity",
+        });
+      },
+    });
+    const dataURL = canvas.toDataURL("image/png");
+    downloadjs(dataURL, "download.png", "image/png");
+  };
   return (
     <ScreenDiv key="third" className="grid gap-3">
-      <div className="flex items-center gap-2 justify-between mb-4">
-        <p className="text-stone-300">Verification Status</p>
-        <p
-          className={
-            isVerified ? "text-green-400 text-sm" : "text-red-400 text-sm"
-          }
-        >
-          {isVerified ? (
-            <div className="bg-green-800/50 text-green-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-                />
-              </svg>
-              Verified
-            </div>
-          ) : (
-            <div className="bg-yellow-800/50 text-yellow-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z"
-                />
-              </svg>
-              Unverified
-            </div>
-          )}
-        </p>
-      </div>
       {isVerified && (
         <div className="w-full">
-          <div className="avatar mx-auto mb-8" />
-          <p className="flex items-center justify-between">
-            <span className="text-stone-500">Name</span>
-            {details.name}
-          </p>
-          <p className="flex items-center justify-between">
-            <span className="text-stone-500">Date of Birth</span>
-            {details.dob}
-          </p>
-          <a
-            className="mt-8 -mb-2 text-center block text-xs text-stone-600 hover:underline underline-offset-1"
-            href="https://minascan.io/"
-            target="_blank"
-          >
-            Verify identity on MinaScan
-          </a>
+          {/* <div className="avatar mx-auto mb-8" /> */}
+          <QRCode ref={ref} uri={`${URL}/verify/${details.uuid}`} />
+          <div className="flex items-center justify-between mt-6 mb-2.5">
+            <span className="text-stone-400">Unique ID</span>
+            <div className="flex items-center justify-center gap-1">
+              <span className="bg-stone-800/80 text-stone-200 rounded-full flex items-center px-2.5 py-1 font-medium text-sm leading-tight">
+                {truncate(details.uuid)}
+              </span>
+              <button
+                className="bg-stone-900 p-1.5 rounded-md text-stone-200 hover:bg-stone-700 hover:text-stone-100 transition-colors bg-overlay"
+                onClick={() => copyToClipboard(details.uuid, onCopySuccess)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-3.5 h-3.5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5A3.375 3.375 0 006.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0015 2.25h-1.5a2.251 2.251 0 00-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 00-9-9z"
+                  />
+                </svg>
+              </button>
+            </div>
+            {/* <span className="">{truncate(details.uuid)}</span> */}
+          </div>
+          <div className="flex items-center gap-2 justify-between mb-4">
+            <p className="text-stone-400">Verification Status</p>
+            <p
+              className={
+                isVerified ? "text-green-400 text-sm" : "text-red-400 text-sm"
+              }
+            >
+              {isVerified ? (
+                <div className="bg-green-800/50 text-green-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                    />
+                  </svg>
+                  Verified
+                </div>
+              ) : (
+                <div className="bg-yellow-800/50 text-yellow-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z"
+                    />
+                  </svg>
+                  Unverified
+                </div>
+              )}
+            </p>
+          </div>
+          <div className="mt-6 -mb-2 ">
+            <button
+              data-html2canvas-ignore
+              className="btn flex-1 w-full"
+              onClick={handleCaptureClick}
+            >
+              Download
+            </button>
+          </div>
         </div>
       )}
       <div className="flex w-full gap-2">
@@ -316,9 +367,11 @@ const MIDVerifier: NextPage<{ isVisible?: boolean }> = ({
           className="transition-[height] bg-stone-950 shadow-2xl rounded-2xl relative overflow-hidden w-[24rem]"
         >
           <div ref={contentRef} className="p-6 ">
+            <Toaster richColors />
             <div className="flex justify-between items-center mb-6">
               <h1 className="font-medium text-2xl text-stone-300">Identity</h1>
               <p
+                data-html2canvas-ignore
                 className="text-xs font-bold text-blue-900 bg-blue-400 rounded-full px-2 py-0.5 flex items-center gap-1 lock-anim whitespace-nowrap overflow-hidden relative bg-overlay"
                 onClick={() => {
                   localStorage.clear();

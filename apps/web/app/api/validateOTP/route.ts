@@ -1,4 +1,9 @@
 import { CONTENT } from "@/constants";
+import crypto from "crypto";
+
+const getUUID = (proof1: string) => {
+  return crypto.randomUUID();
+};
 
 export async function POST(request: Request, response: Response) {
   try {
@@ -34,23 +39,31 @@ export async function POST(request: Request, response: Response) {
 
     // If OTP is correct, return a "success" response code and return the content except the OTP
     const { otp: verifyOTP, ...content } = contentEntry;
+
     if (verifyOTP === OTP) {
-      return new Response(JSON.stringify(content), {
+      // Verifying from ZK
+      const proof1 = "proof1";
+
+      // Return uuid for proof1 through lookup in our supabase database
+      const uuid = getUUID(proof1);
+
+      return new Response(JSON.stringify({ uuid }), {
         status: 200,
         headers: {
           "content-type": "application/json",
         },
       });
+    } else {
+      return new Response(
+        JSON.stringify({ error: "OTP was invalid or missing" }),
+        {
+          status: 400,
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
     }
-    return new Response(
-      JSON.stringify({ error: "OTP was invalid or missing" }),
-      {
-        status: 400,
-        headers: {
-          "content-type": "application/json",
-        },
-      }
-    );
   } catch (e) {
     return new Response(JSON.stringify({ error: "Something went wrong" }), {
       status: 500,

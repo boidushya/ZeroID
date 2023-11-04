@@ -9,26 +9,31 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "downloadjs": "^1.4.7",
     "framer-motion": "^10.16.4",
+    "html2canvas": "^1.4.1",
     "next": "14.0.0",
+    "qrcode": "^1.5.3",
     "react": "^18",
     "react-dom": "^18",
     "react-otp-input": "^3.1.0",
+    "sonner": "^1.1.0",
     "swr": "^2.2.4",
     "zustand": "^4.4.4"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^13.4.19",
+    "@types/downloadjs": "^1.4.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10",
     "eslint": "^8",
+    "eslint-config-custom": "*",
     "eslint-config-next": "14.0.0",
     "postcss": "^8",
     "tailwindcss": "^3",
-    "typescript": "^5",
-    "eslint-config-custom": "*",
-    "tsconfig": "*"
+    "tsconfig": "*",
+    "typescript": "^5"
   }
 }
