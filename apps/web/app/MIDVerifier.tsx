@@ -231,7 +231,7 @@ const ThirdScreen = () => {
     downloadjs(dataURL, "download.png", "image/png");
   };
   return (
-    <ScreenDiv key="third" className="grid gap-3">
+    <ScreenDiv key="third">
       {isVerified && (
         <div className="w-full">
           {/* <div className="avatar mx-auto mb-8" /> */}
@@ -310,7 +310,7 @@ const ThirdScreen = () => {
               )}
             </p>
           </div>
-          <div className="mt-6 -mb-2 ">
+          <div className="mt-6">
             <button
               data-html2canvas-ignore
               className="btn flex-1 w-full"
