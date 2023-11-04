@@ -23,7 +23,7 @@ interface AadharState {
 
 export const useGlobalStore = create<AadharState>()(
   persist(
-    (set) => ({
+    set => ({
       aadhar: "",
       aadharValid: false,
       currentScreen: 0,
@@ -34,19 +34,19 @@ export const useGlobalStore = create<AadharState>()(
         aadhar: "",
         uuid: "",
       },
-      setDetails: (details) => set(() => ({ details })),
+      setDetails: details => set(() => ({ details })),
       incrementScreen: () =>
-        set((state) => ({
+        set(state => ({
           currentScreen:
             state.currentScreen + 1 > MAX_SCREEN
               ? MAX_SCREEN
               : state.currentScreen + 1,
         })),
-      setIsVerified: (isVerified) => set(() => ({ isVerified })),
+      setIsVerified: isVerified => set(() => ({ isVerified })),
       decrementScreen: () =>
-        set((state) => ({ currentScreen: state.currentScreen - 1 })),
-      setAadhar: (newAadhar) => set(() => ({ aadhar: newAadhar })),
-      setAadharValid: (isValid) => set(() => ({ aadharValid: isValid })),
+        set(state => ({ currentScreen: state.currentScreen - 1 })),
+      setAadhar: newAadhar => set(() => ({ aadhar: newAadhar })),
+      setAadharValid: isValid => set(() => ({ aadharValid: isValid })),
       resetScreen: () => set(() => ({ currentScreen: 0 })),
     }),
     {

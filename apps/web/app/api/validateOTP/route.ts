@@ -1,5 +1,5 @@
-import { CONTENT } from "@/constants";
 import crypto from "crypto";
+import { CONTENT } from "@/constants";
 
 const getUUID = (proof1: string) => {
   return crypto.randomUUID();
@@ -23,7 +23,7 @@ export async function POST(request: Request, response: Response) {
     }
 
     // Fetch OTP for aadhar from "database"
-    const contentEntry = CONTENT.find((entry) => entry.aadhar === aadhar);
+    const contentEntry = CONTENT.find(entry => entry.aadhar === aadhar);
     if (!contentEntry) {
       // Return a "not found" response code for invalid aadhar numbers
       return new Response(

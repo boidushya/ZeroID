@@ -1,8 +1,9 @@
 "use client";
 
-import { QrCodeUtil } from "@/utils/QRCodeUtil";
 import { motion } from "framer-motion";
 import { forwardRef } from "react";
+
+import { QrCodeUtil } from "@/utils/QRCodeUtil";
 
 type QrCodeProps = {
   uri: string;

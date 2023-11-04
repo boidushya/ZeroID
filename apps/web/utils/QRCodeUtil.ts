@@ -141,14 +141,14 @@ export const QrCodeUtil = {
     Object.entries(circlesToConnect)
       // Only get dots that have neighbors
       .map(([cx, cys]) => {
-        const newCys = cys.filter((cy) =>
-          cys.every((otherCy) => !isAdjecentDots(cy, otherCy, cellSize))
+        const newCys = cys.filter(cy =>
+          cys.every(otherCy => !isAdjecentDots(cy, otherCy, cellSize))
         );
 
         return [Number(cx), newCys] as CoordinateMapping;
       })
       .forEach(([cx, cys]) => {
-        cys.forEach((cy) => {
+        cys.forEach(cy => {
           dots.push(
             `<svg><circle cx=${cx} cy=${cy} fill=${dotColor} r=${
               cellSize / CIRCLE_SIZE_MODIFIER
@@ -163,8 +163,8 @@ export const QrCodeUtil = {
       .filter(([_, cys]) => cys.length > 1)
       // Removing dots with no neighbors
       .map(([cx, cys]) => {
-        const newCys = cys.filter((cy) =>
-          cys.some((otherCy) => isAdjecentDots(cy, otherCy, cellSize))
+        const newCys = cys.filter(cy =>
+          cys.some(otherCy => isAdjecentDots(cy, otherCy, cellSize))
         );
 
         return [Number(cx), newCys] as CoordinateMapping;
@@ -175,8 +175,8 @@ export const QrCodeUtil = {
         const groups: number[][] = [];
 
         for (const cy of cys) {
-          const group = groups.find((item) =>
-            item.some((otherCy) => isAdjecentDots(cy, otherCy, cellSize))
+          const group = groups.find(item =>
+            item.some(otherCy => isAdjecentDots(cy, otherCy, cellSize))
           );
           if (group) {
             group.push(cy);
@@ -185,7 +185,7 @@ export const QrCodeUtil = {
           }
         }
 
-        return [cx, groups.map((item) => [item[0], item[item.length - 1]])] as [
+        return [cx, groups.map(item => [item[0], item[item.length - 1]])] as [
           number,
           number[][],
         ];

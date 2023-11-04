@@ -1,7 +1,7 @@
 "use client";
 
-import MIDVerifier from "@/app/MIDVerifier";
 import { useState } from "react";
+import MIDVerifier from "@/app/MIDVerifier";
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);

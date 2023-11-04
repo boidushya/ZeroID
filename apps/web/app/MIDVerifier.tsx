@@ -1,16 +1,18 @@
 "use client";
 
+import { useGlobalStore } from "@/contexts";
+import { useResizeObserver } from "@/hooks";
+import downloadjs from "downloadjs";
+import { AnimatePresence, motion } from "framer-motion";
+import html2canvas from "html2canvas";
 import type { NextPage } from "next";
 import { FormEvent, useCallback, useRef, useState } from "react";
-import { useGlobalStore } from "@/contexts";
 import OTPInput from "react-otp-input";
-import { AnimatePresence, motion } from "framer-motion";
-import { useResizeObserver } from "@/hooks";
+import { toast, Toaster } from "sonner";
+
 import QRCode from "@/components/QRCode";
+
 import { copyToClipboard, truncate } from "@/utils/functions";
-import { Toaster, toast } from "sonner";
-import html2canvas from "html2canvas";
-import downloadjs from "downloadjs";
 
 const URL = "https://mid-lake.vercel.app";
 
@@ -92,7 +94,7 @@ const FirstScreen = () => {
             className={` flex-1 w-full border-2 border-stone-900 placeholder:font-sans font-mono px-2 py-1 rounded-md shadow-md bg-transparent text-stone-200 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 ${
               error !== "" && "!border-red-400/25"
             }`}
-            onChange={(e) => setAadharInput(e.target.value)}
+            onChange={e => setAadharInput(e.target.value)}
             placeholder="e.g. 123412341234"
           />
         </div>
@@ -175,7 +177,7 @@ const SecondScreen = () => {
                 numInputs={6}
                 shouldAutoFocus={true}
                 renderSeparator={<span className="flex-1"></span>}
-                renderInput={(props) => (
+                renderInput={props => (
                   <input
                     {...props}
                     pattern="[0-9]*"
@@ -193,7 +195,7 @@ const SecondScreen = () => {
               </button>
               <button
                 className="btn btn-secondary flex-1 order-1"
-                onClick={(e) => {
+                onClick={e => {
                   e.preventDefault();
                   decrementScreen();
                 }}
@@ -222,7 +224,7 @@ const ThirdScreen = () => {
   const handleCaptureClick = async () => {
     const canvas = await html2canvas(ref.current as HTMLElement, {
       backgroundColor: null,
-      onclone: (data) => {
+      onclone: data => {
         toast.success("Downloading image", {
           description: "Share this QR to verify your identity",
         });
