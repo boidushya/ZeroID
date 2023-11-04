@@ -173,6 +173,7 @@ const SecondScreen = () => {
                 value={otpInput}
                 onChange={setOtpInput}
                 numInputs={6}
+                shouldAutoFocus={true}
                 renderSeparator={<span className="flex-1"></span>}
                 renderInput={(props) => (
                   <input
@@ -187,17 +188,17 @@ const SecondScreen = () => {
             </div>
             <p className="text-red-400 text-sm">{error}</p>
             <div className="flex w-full gap-2">
+              <button className="btn flex-1 order-2" type="submit">
+                Next
+              </button>
               <button
-                className="btn btn-secondary flex-1"
+                className="btn btn-secondary flex-1 order-1"
                 onClick={(e) => {
                   e.preventDefault();
                   decrementScreen();
                 }}
               >
                 Back
-              </button>
-              <button className="btn flex-1" type="submit">
-                Next
               </button>
             </div>
           </motion.form>
@@ -272,7 +273,7 @@ const ThirdScreen = () => {
               }
             >
               {isVerified ? (
-                <div className="bg-green-800/50 text-green-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
+                <span className="bg-green-800/50 text-green-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -288,9 +289,9 @@ const ThirdScreen = () => {
                     />
                   </svg>
                   Verified
-                </div>
+                </span>
               ) : (
-                <div className="bg-yellow-800/50 text-yellow-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
+                <span className="bg-yellow-800/50 text-yellow-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -306,7 +307,7 @@ const ThirdScreen = () => {
                     />
                   </svg>
                   Unverified
-                </div>
+                </span>
               )}
             </p>
           </div>
