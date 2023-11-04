@@ -10,19 +10,11 @@ type QrCodeProps = {
 };
 
 const containerAnimStates = {
-  hidden: { opacity: 0, scale: 0.75, y: 50 },
+  hidden: { opacity: 0, scale: 0.75, origin: "center" },
   show: {
     opacity: 1,
     scale: 1,
-    y: 0,
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.5,
-    y: 50,
-    transition: {
-      duration: 0.1,
-    },
+    origin: "center",
   },
 };
 

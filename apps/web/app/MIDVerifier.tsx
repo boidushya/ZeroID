@@ -140,7 +140,7 @@ const SecondScreen = () => {
       } catch (err) {
         setError("Something went wrong. Please try again.");
       }
-    }, 5000);
+    }, 2000);
   };
   return (
     <ScreenDiv key="second">
@@ -181,7 +181,7 @@ const SecondScreen = () => {
                     pattern="[0-9]*"
                     inputMode="numeric"
                     type="text"
-                    className="!w-12 !h-12 rounded-md bg-transparent transition-colors border-2 border-stone-900 focus:outline-none focus:border-stone-600 duration-100"
+                    className="!w-12 !h-12 rounded-md bg-transparent transition-colors border-2 border-stone-900 focus:outline-none focus:border-stone-700 duration-100"
                   />
                 )}
               />
