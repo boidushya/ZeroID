@@ -131,6 +131,7 @@ const SecondScreen = () => {
           body: JSON.stringify({ OTP: otpInput, aadhar }),
         });
         const data = await res.json();
+        console.log(data);
         setIsLoading(false);
         if (res.ok) {
           setIsVerified(true);
@@ -237,7 +238,6 @@ const ThirdScreen = () => {
     <ScreenDiv key="third">
       {isVerified && (
         <div className="w-full">
-          {/* <div className="avatar mx-auto mb-8" /> */}
           <QRCode ref={ref} uri={`${URL}/verify/${details.uuid}`} />
           <div className="flex items-center justify-between mt-6 mb-2.5">
             <span className="text-stone-400">Unique ID</span>

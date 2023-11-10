@@ -1,11 +1,48 @@
-export async function GET(request: Request, response: Response) {
+import { promises as fs } from "fs";
+
+export async function GET(
+  request: Request,
+  { params }: { params: { uuid: string } },
+  response: Response
+) {
   try {
+    const uuid = params.uuid;
+    const file = await fs.readFile(
+      process.cwd() + "/constants/zk.json",
+      "utf8"
+    );
+    // simulate delay for POC
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    const data = JSON.parse(file);
+    // placeholder for POC, replace with zk verifier
+    const existing = data.find((x: any) => x.uuid === uuid);
+    if (!existing) {
+      return new Response(JSON.stringify({ error: "uuid not found" }), {
+        status: 404,
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+    }
+    if (existing.zk === "placeholder") {
+      return new Response(
+        JSON.stringify({
+          success: true,
+        }),
+        {
+          status: 200,
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
+    }
     return new Response(
       JSON.stringify({
-        success: true,
+        error: "ZK Proof not verified for uuid",
       }),
       {
-        status: 200,
+        status: 400,
         headers: {
           "content-type": "application/json",
         },

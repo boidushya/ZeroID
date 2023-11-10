@@ -1,9 +1,6 @@
 import crypto from "crypto";
+import { promises as fs } from "fs";
 import { CONTENT } from "@/constants";
-
-const getUUID = (proof1: string) => {
-  return crypto.randomUUID();
-};
 
 export async function POST(request: Request, response: Response) {
   try {
@@ -41,18 +38,50 @@ export async function POST(request: Request, response: Response) {
     const { otp: verifyOTP, ...content } = contentEntry;
 
     if (verifyOTP === OTP) {
-      // Verifying from ZK
-      const proof1 = "proof1";
+      const uuid = crypto.randomUUID();
 
-      // Return uuid for proof1 through lookup in our supabase database
-      const uuid = getUUID(proof1);
+      const file = await fs.readFile(
+        process.cwd() + "/constants/zk.json",
+        "utf8"
+      );
+      const data = JSON.parse(file);
 
-      return new Response(JSON.stringify({ uuid }), {
-        status: 200,
-        headers: {
-          "content-type": "application/json",
-        },
-      });
+      const existing = data.find(
+        (x: any) => x.uuid === uuid || x.aadhar === aadhar
+      );
+      if (existing) {
+        return new Response(
+          JSON.stringify({
+            uuid: existing.uuid,
+          }),
+          {
+            status: 200,
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+      }
+      // Loading time to simulate a ZK creation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      data.push({ uuid, zk: "placeholder", aadhar });
+      await fs.writeFile(
+        process.cwd() + "/constants/zk.json",
+        JSON.stringify(data),
+        "utf8"
+      );
+
+      return new Response(
+        JSON.stringify({
+          uuid,
+        }),
+        {
+          status: 200,
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
     } else {
       return new Response(
         JSON.stringify({ error: "OTP was invalid or missing" }),
