@@ -6,6 +6,11 @@ import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
 const app = express();
+app.use(express.json());
+app.use(function (err: any, req: any, res: any, next: any) {
+  // All errors from non-async route above will be handled here
+  res.status(500).send(err.message);
+});
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
@@ -14,6 +19,7 @@ app.listen(3000, () => {
 Need to clean up here.
 This part will run everytime seerver boots up because it's required for proof generation.
 */
+
 console.log(`Let's get you verifeid`);
 const { verificationKey } = await ZID.compile();
 console.log(verificationKey);
@@ -25,6 +31,7 @@ console.log(
 const proof0 = await ZID.generatingInitialProof(Field(0));
 console.log(proof0.toJSON());
 console.log(proof0.toJSON().proof);
+
 app.get('/', async (req, res) => {
   res.send('Home');
 });
@@ -33,22 +40,30 @@ app.get('/', async (req, res) => {
  Below are the api to request proofs but we will create only one api this is just for Demo purpose.
   Hope you will enjoy it!!
 */
-app.get('/proof1', async (req, res) => {
-  console.log(`Let's see if this works...`);
-  const fsk = 123; // From env // Couple of inputs will come from frontend and couple will be from backend env variables
-  const rfg = 134; // Resp from gov //Ohh!!! DW we will make it most secure thing. Trust me we are gonna make it big
-  const rfu = 134; // Resp from user
+app.post('/generateproof', async (req, res) => {
+  try {
+    console.log(`Let's see if this works...`);
+    // TODO: Update security
+    const fsk = 123; // From env // Couple of inputs will come from frontend and couple will be from backend env variables
+    const rfg = req.body.aadhar; // Resp from gov //Ohh!!! DW we will make it most secure thing. Trust me we are gonna make it big
+    const rfu = req.body.aadhar; // Resp from user
 
-  const proof1 = await ZID.verifiedUserProof(
-    Field(fsk),
-    proof0,
-    Field(rfg),
-    Field(rfu)
-  );
-  console.log(proof1.toJSON().proof);
-  const data = insertProof(proof1.toJSON());
-  console.log(data);
-  res.send('Proof 1 api hit check console log!!');
+    const proof1 = await ZID.verifiedUserProof(
+      Field(fsk),
+      proof0,
+      Field(rfg),
+      Field(rfu)
+    );
+    console.log(proof1.toJSON().proof);
+    const data = await insertProof(proof1.toJSON());
+    console.log(data);
+    res.json(data);
+  } catch (e: any) {
+    console.log(e.message);
+    res.status(500).json({
+      message: e.message,
+    });
+  }
 });
 
 /* 
@@ -58,28 +73,35 @@ Right we are just too tierd, busy and ill to work on anything but will update it
 */
 
 app.get('/verify/:id', async (req, res) => {
-  const id = req.params.id;
-  const supabase = createClient(
-    process.env.SUPABASE_URL as string,
-    process.env.SUPABASE_SERVICE_ROLE as string
-  );
-  let { data, error } = await supabase.from('zk').select('*').eq('uuid', id);
-  console.log(data);
-  if (error || !data || data.length === 0) {
-    console.log(error);
-    res.status(404).json({
-      message: 'ID not found! Please Verify and generate ID',
-    });
-  } else {
-    const ok = await verifyProof(data[0].zk);
-    if (ok) {
-      res.json({
-        verified: 'true',
-        uuid: data[0].uuid,
+  try {
+    const id = req.params.id;
+    const supabase = createClient(
+      process.env.SUPABASE_URL as string,
+      process.env.SUPABASE_SERVICE_ROLE as string
+    );
+    let { data, error } = await supabase.from('zk').select('*').eq('uuid', id);
+    console.log(data);
+    if (error || !data || data.length === 0) {
+      console.log(error);
+      res.status(404).json({
+        message: 'ID not found! Please Verify and generate ID',
       });
     } else {
-      res.status(400).json({ verified: 'false' });
+      const ok = await verifyProof(data[0].zk);
+      if (ok) {
+        res.json({
+          verified: 'true',
+          uuid: data[0].uuid,
+        });
+      } else {
+        res.status(400).json({ verified: 'false' });
+      }
     }
+  } catch (e: any) {
+    console.log(e.message);
+    res.status(500).json({
+      message: e.message,
+    });
   }
 });
 
@@ -93,16 +115,14 @@ async function insertProof(proof: any) {
   const row = {
     zk: proof,
   };
-  //   const { data, error } = await supabase.from('zk').insert(row).select('uuid');
-  const { data, error } = await supabase.from('zk').insert(row).select('*');
+  const { data, error } = await supabase.from('zk').insert(row).select('uuid');
   if (error || !data) {
     console.log(error);
     return;
   } else {
     console.log('Inserted row:', data);
   }
-  //   return data[0].uuid;
-  return data;
+  return data[0].uuid;
 }
 
 async function verifyProof(proof1: any) {
