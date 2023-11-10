@@ -1,6 +1,7 @@
 import crypto from "crypto";
-import { promises as fs } from "fs";
 import { CONTENT } from "@/constants";
+
+import supabase from "@/utils/supabase";
 
 export async function POST(request: Request, response: Response) {
   try {
@@ -40,13 +41,9 @@ export async function POST(request: Request, response: Response) {
     if (verifyOTP === OTP) {
       const uuid = crypto.randomUUID();
 
-      const file = await fs.readFile(
-        process.cwd() + "/constants/zk.json",
-        "utf8"
-      );
-      const data = JSON.parse(file);
+      let { data } = await supabase.from("zk").select("*");
 
-      const existing = data.find(
+      const existing = data?.find(
         (x: any) => x.uuid === uuid || x.aadhar === aadhar
       );
       if (existing) {
@@ -64,12 +61,13 @@ export async function POST(request: Request, response: Response) {
       }
       // Loading time to simulate a ZK creation
       await new Promise(resolve => setTimeout(resolve, 2000));
-      data.push({ uuid, zk: "placeholder", aadhar });
-      await fs.writeFile(
-        process.cwd() + "/constants/zk.json",
-        JSON.stringify(data),
-        "utf8"
-      );
+
+      const { data: zk, error } = await supabase
+        .from("zk")
+        .insert([{ uuid, aadhar, zk: "placeholder" }])
+        .select();
+
+      console.log(zk, error);
 
       return new Response(
         JSON.stringify({

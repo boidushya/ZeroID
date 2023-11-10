@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
     "downloadjs": "^1.4.7",
     "framer-motion": "^10.16.4",
     "html2canvas": "^1.4.1",

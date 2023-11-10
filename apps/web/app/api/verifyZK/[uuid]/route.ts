@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import supabase from "@/utils/supabase";
 
 export async function GET(
   request: Request,
@@ -7,15 +7,12 @@ export async function GET(
 ) {
   try {
     const uuid = params.uuid;
-    const file = await fs.readFile(
-      process.cwd() + "/constants/zk.json",
-      "utf8"
-    );
     // simulate delay for POC
     await new Promise(resolve => setTimeout(resolve, 5000));
-    const data = JSON.parse(file);
+    let { data, error } = await supabase.from("zk").select("*");
+
     // placeholder for POC, replace with zk verifier
-    const existing = data.find((x: any) => x.uuid === uuid);
+    const existing = data?.find((x: any) => x.uuid === uuid);
     if (!existing) {
       return new Response(JSON.stringify({ error: "uuid not found" }), {
         status: 404,
@@ -37,6 +34,7 @@ export async function GET(
         }
       );
     }
+
     return new Response(
       JSON.stringify({
         error: "ZK Proof not verified for uuid",
