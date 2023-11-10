@@ -14,7 +14,7 @@ import QRCode from "@/components/QRCode";
 
 import { copyToClipboard, truncate } from "@/utils/functions";
 
-const URL = "https://mid-lake.vercel.app";
+const URL = "https://zero-id.vercel.app";
 
 const screenAnimStates = {
   hidden: { opacity: 0, x: 50 },
