@@ -94,6 +94,7 @@ export async function POST(request: Request, response: Response) {
       );
     }
   } catch (e) {
+    console.log(e);
     return new Response(JSON.stringify({ error: "Something went wrong" }), {
       status: 500,
       headers: {

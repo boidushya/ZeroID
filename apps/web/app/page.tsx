@@ -1,10 +1,10 @@
-import MIDVerifier from "./MIDVerifier";
+import ZeroIDVerifier from "./ZeroIDVerifier";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 relative">
       <nav className="absolute top-0 left-0 w-full p-4 text-xl text-stone-200 font-bold flex items-center justify-between">
-        Mina ID POC
+        ZeroID POC
         <a
           href="https://github.com/boidushya/MID"
           target="_blank"
@@ -22,7 +22,7 @@ export default function Home() {
           <span>Source Code</span>
         </a>
       </nav>
-      <MIDVerifier />
+      <ZeroIDVerifier />
     </main>
   );
 }

@@ -8,7 +8,7 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "sonner";
 import useSWR from "swr";
-import MIDVerifier from "@/app/MIDVerifier";
+import ZeroIDVerifier from "@/app/ZeroIDVerifier";
 
 import QRCode from "@/components/QRCode";
 
@@ -151,7 +151,7 @@ export default function Home() {
                     d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
                   />
                 </svg>
-                <span>Secured by MID </span>
+                <span>Secured by ZeroID </span>
               </p>
             </div>
             <AnimatePresence mode="wait">

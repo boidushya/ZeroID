@@ -265,15 +265,10 @@ const ThirdScreen = () => {
                 </svg>
               </button>
             </div>
-            {/* <span className="">{truncate(details.uuid)}</span> */}
           </div>
           <div className="flex items-center gap-2 justify-between mb-4">
             <p className="text-stone-400">Verification Status</p>
-            <p
-              className={
-                isVerified ? "text-green-400 text-sm" : "text-red-400 text-sm"
-              }
-            >
+            <p className="text-sm">
               {isVerified ? (
                 <span className="bg-green-800/50 text-green-300 rounded-full flex items-center px-1.5 py-0.5 gap-1 font-semibold pr-2 text-sm">
                   <svg
@@ -343,7 +338,7 @@ const ThirdScreen = () => {
   );
 };
 
-const MIDVerifier: NextPage<{ isVisible?: boolean }> = ({
+const ZeroIDVerifier: NextPage<{ isVisible?: boolean }> = ({
   isVisible = true,
 }) => {
   const { currentScreen } = useGlobalStore();
@@ -409,7 +404,7 @@ const MIDVerifier: NextPage<{ isVisible?: boolean }> = ({
                     d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
                   />
                 </svg>
-                <span>Secured by MID </span>
+                <span>Secured by ZeroID </span>
               </p>
             </div>
             <AnimatePresence mode="wait">
@@ -424,4 +419,4 @@ const MIDVerifier: NextPage<{ isVisible?: boolean }> = ({
   );
 };
 
-export default MIDVerifier;
+export default ZeroIDVerifier;

@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MID",
-  description: "MID - Verification made easy",
+  title: "ZeroID",
+  description: "ZeroID - Verification made easy",
 };
 
 export default function RootLayout({

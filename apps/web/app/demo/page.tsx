@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import MIDVerifier from "@/app/MIDVerifier";
+import ZeroIDVerifier from "@/app/ZeroIDVerifier";
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
@@ -32,7 +32,7 @@ export default function Home() {
           <span>Verify Identity</span>
         </button>
       </nav>
-      {<MIDVerifier isVisible={isVisible} />}
+      {<ZeroIDVerifier isVisible={isVisible} />}
     </main>
   );
 }
