@@ -18,11 +18,7 @@ console.log(URL);
 
 const app = express();
 app.use(express.json());
-app.use(
-  cors({
-    origin: URL,
-  })
-);
+app.use(cors());
 app.use(function (err: any, req: any, res: any, next: any) {
   res.status(500).send(err.message);
 });
