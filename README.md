@@ -1,90 +1,75 @@
-# Turborepo starter
+<div align="center">
+<img src="logo.png" alt="Logo" width="300">
+</div>
 
-This is an official starter Turborepo.
+# zeroID
 
-## Using this example
+zeroID is a project focused on providing users with a single digital identity or QR code that can be used to verify their identity anywhere in the world. The goal is to solve real-life issues around sharing government-issued IDs across different platforms, which poses privacy and security risks of identity theft.
 
-Run the following command:
+The zero-knowledge proof IDs from ZeroID remove this concern, as the IDs themselves do not contain any personal information without additional user input. They function as secure, universal proofs of identity.
+
+The system is designed for ease-of-use, with no sign ups, fees, or human interaction required for ID generation. Even children can create their own zeroID.
+
+The initial launch focuses on India due to recent incidents of compromised government ID databases. However, the plan is to scale ZeroID globally with support from Mina Protocol.
+
+Beyond identity verification, the ZeroID API enables broader applications to be built on top of the platform, reducing manual verification and potential errors.
+
+
+## Table of Contents
+
+- [About](#about)
+- [Getting Started](#getting_started)
+- [Usage](#usage)
+
+## About <a name = "about"></a>
+
+ZeroID provide a novel zero-knowledge approach to digital identity that prioritizes both security and accessibility. The goal is a foundation for both reliable identity verification as well as future innovation.
+
+It provides users with a single digital identity in the form of a QR code that can be used to verify their identity anywhere in the world. It offers a novel approach to digital IDs using zero-knowledge proof cryptography, removing concerns around privacy and security compared to sharing physical government-issued IDs. Users don't need to worry about their digital ZeroID being stolen or misused.
+
+The system is designed for maximum accessibility, with no sign ups, fees or human interaction required to generate an ID. The goal is ease-of-use for people of all ages and backgrounds.
+
+Initially focused on India to address incidents of compromised government databases, ZeroID aims to scale globally with support from Mina Protocol. The long-term vision is an open identity verification platform that reduces manual checks and drives innovation.
+
+ZeroID removes friction from proving and verifying identity, opening up new possibilities in finance, governance, web3 and more. It represents an important evolution in digital identity.
+
+
+## Getting Started <a name = "getting_started"></a>
+
+To get a local copy of the project up and running, follow these steps.
+
+### Prerequisites
+
+You need to have Node.js and npm installed on your machine.
+
+### Installation
+
+1. Clone the repo
 
 ```sh
-npx create-turbo@latest
+git clone https://github.com/boidushya/ZeroID.git
+```
+2. CD into the folders
+
+```sh
+cd /ZeroID/MID/
 ```
 
-## What's inside?
+3. Install Packages
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `ui`: a stub React component library shared by both `web` and `docs`
-  applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-config-next`
-  and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
+```sh
+npm install
 ```
 
-### Develop
+## Usage <a name = "usage"></a>
 
-To develop all apps and packages, run the following command:
+Run it Locally
 
-```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-Turborepo can use a technique known as
-[Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to
-share cache artifacts across machines, enabling you to share build caches with
-your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need
-an account with Vercel. If you don't have an account you can
-[create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
+```sh
+turbo dev
 ```
 
-This will authenticate the Turborepo CLI with your
-[Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Video Demo : [Click Here](https://youtu.be/3O2vWERGsS0)
 
-Next, you can link your Turborepo to your Remote Cache by running the following
-command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+## License
+This project is licensed under the [MIT] License - see the [LICENSE.md](LICENSE.md) file for details.
