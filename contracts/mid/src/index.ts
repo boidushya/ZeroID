@@ -26,7 +26,10 @@ app.use(function (err: any, req: any, res: any, next: any) {
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: URL,
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   },
 });
 
