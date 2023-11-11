@@ -3,19 +3,59 @@ import { ZID } from './zid.js';
 import { Field, verify } from 'o1js';
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
+import cors from 'cors';
 
 dotenv.config();
+
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.use(function (err: any, req: any, res: any, next: any) {
-  // All errors from non-async route above will be handled here
   res.status(500).send(err.message);
 });
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  },
 });
 
-/* 
+io.on('connection', (socket) => {
+  console.log('user connected');
+  socket.on('generate_proof', async (req) => {
+    console.log(`Let's see if this works...`);
+    // TODO: Update security
+    const fsk = 123; // From env // Couple of inputs will come from frontend and couple will be from backend env variables
+    const rfg = req.aadhar; // Resp from gov //Ohh!!! DW we will make it most secure thing. Trust me we are gonna make it big
+    const rfu = req.aadhar; // Resp from user
+
+    const proof1 = await ZID.verifiedUserProof(
+      Field(fsk),
+      proof0,
+      Field(rfg),
+      Field(rfu)
+    );
+    console.log(proof1.toJSON().proof);
+    const data = await insertProof(proof1.toJSON());
+    console.log(data);
+    socket.emit('proof_generated', {
+      message: 'Proof generated',
+      proof: data,
+    });
+  });
+  socket.on('disconnect', function () {
+    console.log('user disconnected');
+  });
+});
+
+server.listen(8000, () => {
+  console.log('Server is running on port 8000');
+});
+
+/*
 Need to clean up here.
 This part will run everytime seerver boots up because it's required for proof generation.
 */

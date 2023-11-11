@@ -1,5 +1,3 @@
-import supabase from "@/utils/supabase";
-
 export async function GET(
   request: Request,
   { params }: { params: { uuid: string } },
@@ -8,31 +6,20 @@ export async function GET(
   try {
     const uuid = params.uuid;
     // simulate delay for POC
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    let { data, error } = await supabase.from("zk").select("*");
+    // await new Promise(resolve => setTimeout(resolve, 5000));
+    // let { data, error } = await supabase.from("zk").select("*");
 
     // placeholder for POC, replace with zk verifier
-    const existing = data?.find((x: any) => x.uuid === uuid);
-    if (!existing) {
-      return new Response(JSON.stringify({ error: "uuid not found" }), {
-        status: 404,
+    const res: any = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/verify/${uuid}`
+    );
+    if (res.ok && res.verified === "true") {
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
         headers: {
           "content-type": "application/json",
         },
       });
-    }
-    if (existing.zk === "placeholder") {
-      return new Response(
-        JSON.stringify({
-          success: true,
-        }),
-        {
-          status: 200,
-          headers: {
-            "content-type": "application/json",
-          },
-        }
-      );
     }
 
     return new Response(

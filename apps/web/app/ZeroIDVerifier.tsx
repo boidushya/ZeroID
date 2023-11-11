@@ -6,13 +6,14 @@ import downloadjs from "downloadjs";
 import { AnimatePresence, motion } from "framer-motion";
 import html2canvas from "html2canvas";
 import type { NextPage } from "next";
-import { FormEvent, useCallback, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import OTPInput from "react-otp-input";
 import { toast, Toaster } from "sonner";
 
 import QRCode from "@/components/QRCode";
 
 import { copyToClipboard, truncate } from "@/utils/functions";
+import { socket } from "@/utils/socket";
 
 const URL = "https://zero-id.vercel.app";
 
@@ -124,27 +125,49 @@ const SecondScreen = () => {
   const validateOTP = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(async () => {
-      try {
-        const res = await fetch("/api/validateOTP", {
-          method: "POST",
-          body: JSON.stringify({ OTP: otpInput, aadhar }),
-        });
-        const data = await res.json();
-        console.log(data);
+    try {
+      console.log("Sending generate_proof");
+      socket.emit("generate_proof", { aadhar }, () => {
         setIsLoading(false);
-        if (res.ok) {
-          setIsVerified(true);
-          setDetails(data);
-          incrementScreen();
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Something went wrong. Please try again.");
-      }
-    }, 2000);
+      });
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    }
   };
+
+  const [isConnected, setIsConnected] = useState(socket.connected);
+
+  useEffect(() => {
+    function onConnect() {
+      console.log("connected");
+      setIsConnected(true);
+    }
+
+    function onDisconnect() {
+      console.log("disconnected");
+      setIsConnected(false);
+    }
+
+    function onProofGenerated(proof) {
+      setIsLoading(false);
+      setIsVerified(true);
+      console.log(proof);
+      setDetails(proof.data);
+      incrementScreen();
+    }
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+
+    socket.on("proof_generated", onProofGenerated);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("proof_generated", onProofGenerated);
+    };
+  }, []);
+
   return (
     <ScreenDiv key="second">
       <AnimatePresence initial={false}>
@@ -156,7 +179,7 @@ const SecondScreen = () => {
             transition={{ delay: 0.5 }}
             className="flex items-center justify-between gap-2 text-stone-400"
           >
-            Authenticating with Aadhar <div className="loader"></div>
+            Authenticating, this may take a while <div className="loader"></div>
           </motion.div>
         ) : (
           <motion.form
@@ -191,8 +214,12 @@ const SecondScreen = () => {
             </div>
             <p className="text-red-400 text-sm">{error}</p>
             <div className="flex w-full gap-2">
-              <button className="btn flex-1 order-2" type="submit">
-                Next
+              <button
+                className="btn flex-1 order-2"
+                type="submit"
+                disabled={!isConnected}
+              >
+                {!isConnected ? "Connecting..." : "Next"}
               </button>
               <button
                 className="btn btn-secondary flex-1 order-1"
