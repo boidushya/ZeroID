@@ -133,7 +133,7 @@ const SecondScreen = () => {
     }
   };
 
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(socket.connected || false);
 
   useEffect(() => {
     function onConnect() {
