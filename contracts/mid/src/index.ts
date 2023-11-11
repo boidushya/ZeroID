@@ -14,6 +14,8 @@ const URL =
     ? (process.env.FRONTEND_URL as string)
     : 'http://localhost:3000';
 
+console.log(URL);
+
 const app = express();
 app.use(express.json());
 app.use(
