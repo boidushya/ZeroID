@@ -175,7 +175,7 @@ const SecondScreen = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-stone-400 flex flex-col gap-4"
+            className="text-stone-400 flex flex-col gap-5"
           >
             <h3 className="text-stone-400">
               Verifying for the first time takes a while. Meanwhile, here
