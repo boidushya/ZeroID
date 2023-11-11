@@ -51,9 +51,11 @@ io.on('connection', (socket) => {
     console.log(proof1.toJSON().proof);
     const data = await insertProof(proof1.toJSON());
     console.log(data);
-    socket.emit('proof_generated', {
-      message: 'Proof generated',
-      proof: data,
+    console.log('Emitting proof_generated');
+    io.emit('proof_generated', {
+      proof: {
+        uuid: data,
+      },
     });
   });
   socket.on('disconnect', function () {

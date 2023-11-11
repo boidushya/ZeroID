@@ -127,9 +127,7 @@ const SecondScreen = () => {
     setIsLoading(true);
     try {
       console.log("Sending generate_proof");
-      socket.emit("generate_proof", { aadhar }, () => {
-        setIsLoading(false);
-      });
+      socket.emit("generate_proof", { aadhar });
     } catch (err) {
       setError("Something went wrong. Please try again.");
     }
@@ -148,11 +146,11 @@ const SecondScreen = () => {
       setIsConnected(false);
     }
 
-    function onProofGenerated(proof) {
+    function onProofGenerated({ proof }) {
       setIsLoading(false);
       setIsVerified(true);
-      console.log(proof);
-      setDetails(proof.data);
+      console.log("proof generated", proof);
+      setDetails(proof);
       incrementScreen();
     }
 
@@ -177,9 +175,25 @@ const SecondScreen = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 0.5 }}
-            className="flex items-center justify-between gap-2 text-stone-400"
+            className="text-stone-400 flex flex-col gap-4"
           >
-            Authenticating, this may take a while <div className="loader"></div>
+            <h3 className="text-stone-400">
+              Verifying for the first time takes a while. Meanwhile, here
+              {"'"}s a funny cat video!
+            </h3>
+            <div className="video-container">
+              <iframe
+                src="https://www.youtube.com/embed/JxS5E-kZc2s?si=H9H5aTQvxUTO2YNu"
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
+            </div>
+
+            <div className="flex items-center justify-between text-stone-500">
+              Authenticating, this may take a while{" "}
+              <div className="loader"></div>
+            </div>
           </motion.div>
         ) : (
           <motion.form
