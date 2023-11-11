@@ -9,9 +9,18 @@ import cors from 'cors';
 
 dotenv.config();
 
+const URL =
+  process.env.NODE_ENV === 'production'
+    ? (process.env.FRONTEND_URL as string)
+    : 'http://localhost:3000';
+
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: URL,
+  })
+);
 app.use(function (err: any, req: any, res: any, next: any) {
   res.status(500).send(err.message);
 });
@@ -19,7 +28,7 @@ app.use(function (err: any, req: any, res: any, next: any) {
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: URL,
   },
 });
 
